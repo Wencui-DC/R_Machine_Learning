@@ -1,0 +1,57 @@
+---
+title: "Final Project"
+author: "Zhiwei Zhang"
+date: "2021/7/21"
+output: html_document
+---
+
+```{r setup, echo = FALSE, message=FALSE,warning = FALSE}
+knitr::opts_chunk$set(warning = FALSE,message = FALSE)
+```
+
+## Steps
+
+
+### Eliminate near zero variance variables
+
+First, we need to eliminate the near zero variance variables.
+
+```{r Import Data}
+
+library(caret)
+library(gbm)
+library(ggplot2)
+Training <- read.csv("C:/Users/Zhang/Downloads/pml-training.csv")
+
+nzv = nearZeroVar(Training, saveMetrics = TRUE)
+nzv2 = nzv[nzv$nzv==FALSE,]
+vari = rownames(nzv2)
+
+Training2 = Training[,vari] # Training2 is the data without near zero variance variables.
+
+Training2 = Training2[,!colSums(is.na(Training2)) > 0]
+```
+
+
+
+### Train the data
+
+
+
+```{r pressure, echo= TRUE, message=FALSE,warning = FALSE}
+plsFit = train(classe~., data = Training2, method = "rpart")
+print(plsFit$finalModel)
+
+ggplot(plsFit)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+### Test the model
+```{r Test}
+testing <- read.csv("C:/Users/Zhang/Downloads/pml-testing.csv")
+predicted = predict(plsFit, newdata = testing)
+
+
+```
